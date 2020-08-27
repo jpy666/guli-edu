@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bupt.eduservice.mapper.EduCourseMapper">
+    <select id="getCoursePublish" parameterType="java.lang.String" resultType="com.bupt.eduservice.entity.course.CoursePublish">
+        select ec.id,ec.title,ec.cover,ec.lesson_num,ec.price,es.title as subjectTitle,es1.title as subjectParentTitle,et.name as teacherName from edu_course ec
+        left outer join edu_course_description ed on ec.id = ed.id
+        left outer join edu_teacher et on et.id = ec.teacher_id
+        left outer join edu_subject es on ec.subject_id = es.id
+        left outer join edu_subject es1 on ec.subject_parent_id = es1.id
+        where ec.id = #{couseId}
+    </select>
+
+    <select id="getCourseInfo" parameterType="java.lang.String" resultType="com.bupt.eduservice.entity.vo.front.CourseWebVo">
+        select ec.id,ec.title,ec.cover,ec.lesson_num,ec.price,ec.cover,ec.buy_count as buyCount,ec.view_count as viewCount,ed.description,et.id as teacherId,et.level,et.name as teacherName,et.intro,et.avatar,es.title as subjectLevelTwo,es.id as subjectLevelTwoId,es1.title as subjectLevelOne,es1.id as subjectLevelOneId from edu_course ec
+        left outer join edu_course_description ed on ec.id = ed.id
+        left outer join edu_teacher et on et.id = ec.teacher_id
+        left outer join edu_subject es on ec.subject_id = es.id
+        left outer join edu_subject es1 on ec.subject_parent_id = es1.id
+        where ec.id = #{couseId}
+    </select>
+</mapper>
