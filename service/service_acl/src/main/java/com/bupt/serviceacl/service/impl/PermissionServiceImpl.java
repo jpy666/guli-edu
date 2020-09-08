@@ -43,7 +43,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         QueryWrapper<Permission> wrapper = new QueryWrapper<>();
         wrapper.orderByDesc("id");
         List<Permission> permissionList = baseMapper.selectList(wrapper);
-
+        System.out.println(permissionList.size() + "============");
         List<Permission> result = bulid(permissionList);
 
         return result;
@@ -131,11 +131,19 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             //如果是超级管理员，获取所有菜单
             selectPermissionList = baseMapper.selectList(null);
         } else {
+            System.out.println("普通用户");
             selectPermissionList = baseMapper.selectPermissionByUserId(userId);
+            QueryWrapper<Permission> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("pid",0);
+            Permission permission = baseMapper.selectOne(queryWrapper);
+            selectPermissionList.add(permission);
+            System.out.println(selectPermissionList);
         }
 
         List<Permission> permissionList = PermissionHelper.bulid(selectPermissionList);
+        System.out.println("树形结构是" + permissionList);
         List<JSONObject> result = MemuHelper.bulid(permissionList);
+        System.out.println("格式化后的结果是" + result);
         return result;
     }
 
@@ -179,6 +187,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 trees.add(findChildren(treeNode,treeNodes));
             }
         }
+        System.out.println(trees.size() + "-------------");
         return trees;
     }
 
@@ -302,7 +311,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             rolePermissionList.add(rolePermission);
         }
         //添加到角色菜单关系表
-        rolePermissionService.saveBatch(rolePermissionList);
+        boolean b = rolePermissionService.saveBatch(rolePermissionList);
+        if(b) {
+            System.out.println("添加成功");
+        }
     }
 
     @Override
@@ -323,6 +335,20 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         this.selectIdList(id,idList);
         idList.add(id);
         baseMapper.deleteBatchIds(idList);
+    }
+
+    //为角色分配菜单
+    @Override
+    public void saveRolePermissionRealtionShipBupt(String roleId, String[] permissionId) {
+        List<RolePermission> permissions = new ArrayList<>();
+        for(String permission : permissionId) {
+            RolePermission rolePermission = new RolePermission();
+            rolePermission.setPermissionId(permission);
+            rolePermission.setRoleId(roleId);
+            permissions.add(rolePermission);
+        }
+        System.out.println("+++++++++++++++++++++++");
+        rolePermissionService.saveBatch(permissions);
     }
 
     private void selectIdList(String id, List<String> idList) {

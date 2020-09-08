@@ -45,4 +45,6 @@ public interface PermissionService extends IService<Permission> {
     List<Permission> queryAllMenuBupt();
 
     void removeChildByIdBupt(String id);
+
+    void saveRolePermissionRealtionShipBupt(String roleId, String[] permissionId);
 }

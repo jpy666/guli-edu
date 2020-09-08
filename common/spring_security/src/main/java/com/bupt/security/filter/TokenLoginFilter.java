@@ -40,6 +40,7 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
         this.tokenManager = tokenManager;
         this.redisTemplate = redisTemplate;
         this.setPostOnly(false);
+        System.out.println("开始登录验证");
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/acl/login","POST"));
     }
 
@@ -48,7 +49,7 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
             throws AuthenticationException {
         try {
             User user = new ObjectMapper().readValue(req.getInputStream(), User.class);
-
+            System.out.println(user.getUsername());
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), new ArrayList<>()));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -71,7 +72,7 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
         SecurityUser user = (SecurityUser) auth.getPrincipal();
         String token = tokenManager.createToken(user.getCurrentUserInfo().getUsername());
         redisTemplate.opsForValue().set(user.getCurrentUserInfo().getUsername(), user.getPermissionValueList());
-
+        System.out.println("登录成功");
         ResponseUtil.out(res, R.ok().data("token", token));
     }
 
@@ -86,6 +87,7 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException e) throws IOException, ServletException {
+        System.out.println("登录失败");
         ResponseUtil.out(response, R.error());
     }
 }

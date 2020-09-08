@@ -29,7 +29,8 @@ public class PermissionController {
     @ApiOperation(value = "查询所有菜单")
     @GetMapping
     public R indexAllPermission() {
-        List<Permission> list =  permissionService.queryAllMenuBupt();
+        List<Permission> list =  permissionService.queryAllMenuGuli();
+        System.out.println(list);
         return R.ok().data("children",list);
     }
 
@@ -40,7 +41,7 @@ public class PermissionController {
         return R.ok();
     }
 
-    @ApiOperation(value = "给角色分配权限")
+    @ApiOperation(value = "给角色分配权限(菜单)")
     @PostMapping("/doAssign")
     public R doAssign(String roleId,String[] permissionId) {
         permissionService.saveRolePermissionRealtionShipGuli(roleId,permissionId);
